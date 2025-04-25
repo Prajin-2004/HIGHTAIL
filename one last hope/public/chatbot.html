@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+<style>
+       body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #0a0a0a;
+    margin: 0 auto;
+    padding: 20px;
+    color: #fff;
+    width: 1000px;
+}
+
+#chatbox {
+    width: 100%;
+    max-width: 850px;
+    height: 400px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(72, 0, 72, 0.3);
+    overflow-y: auto;
+    padding: 18px;
+    margin: auto;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #cbfffa;
+}
+
+.user, .bot {
+    margin: 10px 0;
+    padding: 14px 20px;
+    border-radius: 18px;
+    max-width: 80%;
+    word-wrap: break-word;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.user {
+    background: #cbfffa;
+    color: black;
+    align-self: flex-end;
+    border-bottom-right-radius: 8px;
+}
+
+.bot {
+    background: #0a0a0a;
+    color: white;
+    align-self: flex-start;
+    border-bottom-left-radius: 8px;
+}
+
+.input-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+input {
+    width: 75%;
+    padding: 14px;
+    border: 2px solid #cbfffa;
+    border-radius: 22px;
+    outline: none;
+    font-size: 16px;
+    background: #111;
+    color: #fdfbfb;
+}
+
+button {
+    padding: 14px 18px;
+    margin-left: 10px;
+    background: #cbfffa;
+    color: rgb(10, 10, 10);
+    border: none;
+    border-radius: 22px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background:  #05d9ff;
+}
+
+#chatbox::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chatbox::-webkit-scrollbar-thumb {
+    background: #0a0a0a;
+    border-radius: 6px;
+}
+
+#chatbox::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content:flex-start;
+    cursor: pointer;
+   
+}
+
+.logo img {
+    height: 40px;
+    margin-right: 10px;
+     margin-top: 15px;
+}
+
+.logo span {
+    font-size: 22px;
+    font-weight: 600;
+    color: #CBFFFA;
+    margin-top: 15px;
+}
+</style>
+</head>
+<body>
+     <div class="logo" onclick="window.location.href='homepage.html'">
+        <img src="image/logo1.png" alt="Logo">
+        <span>HIGHTAIL</span>
+    </div>
+    <h2>HIGH INTA</h2>
+    <div id="chatbox"></div>
+    <div class="input-container">
+        <input type="text" id="userInput" placeholder="Ask me anything about job related " onkeypress="handleKeyPress(event)" />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+            function getToken() {
+        return localStorage.getItem("token");
+    }
+
+    function getUser() {
+        return localStorage.getItem("currentUser"); // Store current user identifier
+    }
+
+    function setUser(user) {
+        localStorage.setItem("currentUser", user);
+    }
+
+    function checkUser() {
+        const token = getToken();
+        const currentUser = getUser();
+        
+        if (token) {
+            const decodedToken = parseJwt(token);
+            const newUser = decodedToken?.email || decodedToken?.id; // Extract user ID or email
+
+            if (newUser !== currentUser) {
+                localStorage.setItem("chatHistory", ""); // Clear chat for new user
+                setUser(newUser);
+                location.reload(); // Reload to start a fresh chat
+            }
+        }
+    }
+
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
+        } catch (e) {
+            return null;
+        }
+    }
+        async function sendMessage() {
+            const token = getToken();
+        if (!token) {
+            alert("You must be logged in to chat.");
+            return;
+        }
+
+            const input = document.getElementById("userInput");
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += `<div class="user">${message}</div>`;
+            input.value = "";
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            try {
+                const apiKey = "AIzaSyDFrKLnSBIeyD6y_4xUKpOak9mFffkg5W0"; // Replace with your actual API key
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: message }] }]
+                    })
+                });
+
+                const data = await response.json();
+                const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't understand that.";
+
+                chatbox.innerHTML += `<div class="bot">${reply}</div>`;
+                chatbox.scrollTop = chatbox.scrollHeight;
+            } catch (error) {
+                chatbox.innerHTML += `<div class="bot">Error: Unable to connect.</div>`;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+        window.onload = checkUser; // Run checkUser on page load
+    </script>
+</body>
+</html>

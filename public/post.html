@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Job Post</title>
+</head>
+<style>
+    /* General Page Styling */
+body {
+    font-family: Arial, sans-serif;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Job Post Form Container */
+#jobPostForm {
+    background: transparent;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.6);
+    width: 450px;
+    text-align: center;
+    color: #e0e0e0;
+    overflow-y: auto;
+    max-height: 90vh;
+    height: 80%;
+    margin-top: 40px;
+}
+
+/* Form Heading */
+h2 {
+    position: absolute;
+    top: 25px;
+    left: 45%;
+    color: #cbfffa;
+}
+
+/* Labels */
+label {
+    display: block;
+    text-align: left;
+    font-size: 14px;
+    color: #b3b3b3;
+    margin-top: 10px;
+}
+
+/* Input Fields */
+input, textarea {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #2a2a2a;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    margin-top: 5px;
+}
+
+/* Textarea Styling */
+textarea {
+    height: 100px;
+    resize: none;
+}
+
+/* File Upload Styling */
+input[type="file"] {
+    padding: 8px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 12px;
+    background: #cbfffa; /* Spotify Green */
+    border: none;
+    border-radius: 6px;
+    color: #121212;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #05d9ff;
+}
+
+/* Scrollable Form */
+#jobPostForm::-webkit-scrollbar {
+    width: 6px;
+    display: none;
+}
+
+#jobPostForm::-webkit-scrollbar-thumb {
+    background: #cbfffa;
+    border-radius: 6px;
+}
+
+#jobPostForm::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+/* Logo Styling */
+.logo {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .logo img {
+        height: 40px;
+        margin-right: 10px;
+        margin-left: 250px;
+    }
+    
+    .logo span {
+        font-size: 22px;
+        font-weight: 600;
+        color: #cbfffa;
+    }
+</style>
+<body>
+    <div class="logo" onclick="window.location.href='homepage.html'">
+        <img src="image/logo1.png" alt="Logo">
+        <span>HIGHTAIL</span>
+    </div>
+
+
+    <h2>Add Job Post</h2>
+    
+    <form id="jobPostForm" enctype="multipart/form-data">
+        <label for="jobTitle">Job Title:</label>
+        <input type="text" id="jobTitle" name="jobTitle" required>
+
+        <label for="companyName">Company Name:</label>
+        <input type="text" id="companyName" name="companyName" required>
+
+
+        <label for="jobDescription">Job Description:</label>
+        <textarea id="jobDescription" name="jobDescription" required></textarea>
+
+        <label for="location">Job Location:</label>
+        <input type="text" id="location" name="location" required>
+
+        <label for="salary">Salary :</label>
+        <input type="text" id="salary" name="salary" required>
+
+        <label for="jobImage">Upload Job Image:</label>
+        <input type="file" id="jobImage" name="jobImage" accept=".jpg, .jpeg, .png" required>
+
+        <button type="submit">Post Job</button>
+    </form>
+
+    <script>
+        document.getElementById("jobPostForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("You must be logged in as an admin to post a job.");
+                return;
+            }
+
+            const formData = new FormData(this);
+            
+            fetch("http://localhost:4000/add-job", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert("Job posted successfully!");
+                    this.reset();
+                } else {
+                    alert("Error posting job.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+
+</body>
+</html>

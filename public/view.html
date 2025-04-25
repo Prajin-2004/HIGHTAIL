@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Job Posts</title>
+</head>
+<style>
+    /* General Page Styling */
+    body {
+    font-family: Arial, sans-serif;
+    background: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    color: #e0e0e0;
+    width: 1000px; /* Set the body width */
+    margin: 0 auto; /* Center the body */
+}
+
+
+/* Heading */
+h2 {
+    color: #cbfffa;
+    margin-bottom: 20px;
+}
+
+/* Job List Container */
+#jobList {
+    width: 80%;
+    max-width: 700px;
+    background: #1e1e1e; /* Dark gray */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+/* Individual Job Post */
+#jobList div {
+    background: #2a2a2a; /* Slightly lighter gray */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+/* Job Titles */
+h3 {
+    color: #cbfffa; /* Green accent */
+    margin-bottom: 10px;
+}
+
+/* Job Details */
+p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #b3b3b3;
+}
+
+/* Job Image */
+img {
+    display: block;
+    width: 100px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border: 2px solid #cbfffa;
+}
+
+/* Delete Button */
+button {
+    width: 100%;
+    padding: 10px;
+    background: #a10e27; /* Dark red */
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #7c0a1c;
+}
+
+/* Horizontal Line */
+hr {
+    border: none;
+    height: 1px;
+    background: #ffffff50;
+    margin-top: 10px;
+}
+#modalDescription {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: block;
+    max-height: 200px; /* Adjust as needed */
+    overflow-y: auto;
+}
+/* Logo Styling */
+.logo {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .logo img {
+        height: 40px;
+        margin-right: 10px;
+        margin-left: 250px;
+    }
+    
+    .logo span {
+        font-size: 22px;
+        font-weight: 600;
+        color: #cbfffa;
+    }
+</style>
+<body>
+    <div class="logo" onclick="window.location.href='homepage.html'">
+        <img src="image/logo1.png" alt="Logo">
+        <span>HIGHTAIL</span>
+    </div>
+    <h2>My Job Posts</h2>    
+    <div id="jobList"></div>
+    <script>
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("You must be logged in as an admin to view job posts.");
+            window.location.href = "login.html";
+        }
+
+        function fetchJobs() {
+            fetch("http://localhost:4000/my-jobs", {
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(jobs => {
+                const jobList = document.getElementById("jobList");
+                jobList.innerHTML = "";
+
+                jobs.forEach(job => {
+                    const jobDiv = document.createElement("div");
+                    jobDiv.innerHTML = `
+                        <h3>${job.jobTitle}</h3>
+                        <p><strong>Company:</strong> ${job.companyName}</p>
+                        <p id ="modalDescription"><strong>Description:</strong> ${job.jobDescription}</p>
+                        <p><strong>Location:</strong> ${job.location}</p>
+                        <p><strong>Salary:</strong> ${job.salary}</p>
+                        <img src="http://localhost:4000/uploads/${job.jobImage}" alt="Job Image" width="100">
+                        <button onclick="deleteJob('${job._id}')">Remove</button>
+                        <hr>
+                    `;
+                    jobList.appendChild(jobDiv);
+                });
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function deleteJob(jobId) {
+            if (confirm("Are you sure you want to delete this job post?")) {
+                fetch(`http://localhost:4000/delete-job/${jobId}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    fetchJobs();
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        }
+
+        fetchJobs();
+    </script>
+
+</body>
+</html>

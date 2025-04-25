@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - Hightail</title>
+    <style>
+        /* General Page Styling */
+    body {
+        font-family: Arial, sans-serif;
+        background: black;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: #070707;
+        width: 1000px; /* Set the body width to 1000px */
+        margin-left: auto;
+        margin-right: auto; /* Center the body horizontally */
+    }
+    
+    /* Container Styling */
+    .container {
+        background: transparent; /* Dark gray */
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.6);
+        text-align: center;
+        width: 350px;
+    }
+    
+    /* Heading */
+    h2 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #cbfffa; /* Green Accent */
+    }
+    
+    /* Form Inputs */
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #444;
+        border-radius: 6px;
+        background: #2a2a2a;
+        color: white;
+        font-size: 16px;
+        outline: none;
+    }
+    
+    /* Placeholder Styling */
+    input::placeholder, textarea::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* Submit Button */
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #cbfffa; /* Green Accent */
+        border: none;
+        border-radius: 6px;
+        color: #121212;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
+    
+    button:hover {
+        background: #05d9ff;
+    }
+    
+    /* Response Message */
+    #responseMessage {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #ff4d4d;
+    }
+    
+    /* Logo Styling */
+    .logo {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .logo img {
+        height: 40px;
+        margin-right: 10px;
+        margin-left: 250px;
+    }
+    
+    .logo span {
+        font-size: 22px;
+        font-weight: 600;
+        color: #cbfffa;
+    }
+    </style>
+    
+</head>
+<body>
+    <div class="logo" onclick="window.location.href='homepage.html'">
+        <img src="image/logo1.png" alt="Logo">
+        <span>HIGHTAIL</span>
+    </div>
+    <div class="container">
+        <h2>Feedback</h2>
+        <form id="feedbackForm">
+            <input type="text" id="name" placeholder="Your Name" required>
+            <input type="email" id="email" placeholder="Your Email" required>
+            <select id="rating" required>
+                <option value="">Rate Us</option>
+                <option value="5">Excellent</option>
+                <option value="4">Very Good</option>
+                <option value="3">Good</option>
+                <option value="2">Fair</option>
+                <option value="1">Poor</option>
+            </select>
+            <textarea id="message" placeholder="Your Feedback" rows="4" required></textarea>
+            <button type="submit">Submit Feedback</button>
+        </form>
+        <p id="responseMessage"></p>
+    </div>
+    <script>
+      document.getElementById('feedbackForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const rating = document.getElementById('rating').value;
+    const message = document.getElementById('message').value;
+
+    try {
+        const response = await fetch('/submit-feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, rating, message })
+        });
+
+        const data = await response.json();
+        document.getElementById('responseMessage').innerText = data.message;
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+        document.getElementById('responseMessage').innerText = 'Failed to submit feedback.';
+    }
+});
+
+    </script>
+</body>
+</html>

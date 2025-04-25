@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Jobs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+/* General Page Styling */
+body {
+    font-family: Arial, sans-serif;
+    background: black; /* Dark green to deep violet */
+    margin: 0 auto; /* Center the body */
+    padding: 20px;
+    text-align: center;
+    color: #e0e0e0;
+    max-width: 1000px; /* Set body width */
+}
+
+/* Page Heading */
+h1 {
+    margin-bottom: 20px;
+    font-size: 28px;
+    color: #cbfffc;
+}
+
+/* Saved Jobs Container */
+#savedJobsContainer {
+    max-width: 800px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Job Card */
+.job-card {
+    background: #1e1e1e; /* Dark gray */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: 0.3s;
+}
+
+.job-card:hover {
+    transform: scale(1.02);
+}
+
+/* Job Image */
+.job-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* Job Info */
+.job-info {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.job-info h3 {
+    margin: 5px 0;
+    font-size: 18px;
+    color: #cbfffa; /* Green accent */
+}
+
+.job-info p {
+    margin: 2px 0;
+    font-size: 14px;
+    color: #b3b3b3;
+}
+
+/* Remove Button */
+.remove-save {
+    background: #b91c1c; /* Dark red */
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.remove-save:hover {
+    background: #991b1b;
+}
+
+#modalDescription {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: block;
+    max-height: 200px; /* Adjust as needed */
+    overflow-y: auto;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content:flex-start;
+    cursor: pointer;
+}
+
+.logo img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo span {
+    font-size: 22px;
+    font-weight: 600;
+    color: #CBFFFA;
+}
+
+</style>
+<body>
+    <div class="logo" onclick="window.location.href='homepage.html'">
+        <img src="image/logo1.png" alt="Logo">
+        <span>HIGHTAIL</span>
+    </div>
+    <h1>Saved Jobs</h1>
+    <div id="savedJobsContainer"></div>
+    
+    <script>
+        async function fetchSavedJobs() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("You must be logged in to view saved jobs.");
+                return;
+            }
+            
+            try {
+                const response = await fetch("http://localhost:4000/view-saved-jobs", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const savedJobs = await response.json();
+                
+                const container = document.getElementById("savedJobsContainer");
+                container.innerHTML = "";
+                
+                if (!savedJobs.length) {
+                    container.innerHTML = "<p>No saved jobs found.</p>";
+                    return;
+                }
+                
+                savedJobs.forEach(job => {
+                    const jobCard = document.createElement("div");
+                    jobCard.classList.add("job-card");
+                    jobCard.innerHTML = `
+                        <img src="http://localhost:4000/uploads/${job.jobImage}" alt="Job Image">
+                        <div class="job-info">
+                            <h3>${job.jobTitle}</h3>
+                            <p>${job.companyName}</p>
+                            <p>${job.location} | 💰 ${job.salary}</p>
+                        </div>
+                        <button class="remove-save" data-jobid="${job.jobId}">Remove</button>
+                    `;
+                    container.appendChild(jobCard);
+                });
+                
+                document.querySelectorAll(".remove-save").forEach(button => {
+                    button.addEventListener("click", (event) => {
+                        const jobId = event.target.dataset.jobid;
+                        removeSavedJob(jobId);
+                    });
+                });
+            } catch (error) {
+                console.error("Error fetching saved jobs:", error);
+            }
+        }
+        
+        async function removeSavedJob(jobId) {
+            const token = localStorage.getItem("token");
+            try {
+                const response = await fetch("http://localhost:4000/remove-saved-job", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ jobId })
+                });
+                const data = await response.json();
+                alert(data.message);
+                fetchSavedJobs();
+            } catch (error) {
+                console.error("Error removing saved job:", error);
+            }
+        }
+        
+        fetchSavedJobs();
+    </script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updated UI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0 auto;
+            font-family: 'Poppins', sans-serif;
+            background-color: black;
+            width: 1000px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: black;
+            color: #CBFFFA;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 1000px;
+            top: 0;
+            transition: background-color 0.3s;
+            font-size: 18px;
+            z-index: 100;
+        }
+        .header.scrolled {
+            background-color: black;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .logo span {
+            font-size: 22px;
+            font-weight: 600;
+            color: #CBFFFA;
+        }
+        .nav-buttons button {
+            margin: 0 8px;
+            padding: 8px 15px;
+            border: none;
+            background-color: #CBFFFA;
+            color: black;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .nav-buttons button:hover {
+            background-color: #05d9ff;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-top: 70px;
+            width: 50%;
+            margin-left: 32%;
+            margin-right: auto;
+        }
+        .search-bar input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 5px;
+            width: 100%;
+        }
+        .search-bar i {
+            font-size: 18px;
+            color: black;
+        }
+        .profile-menu {
+            position: relative;
+        }
+        .profile-menu i {
+            font-size: 30px;
+            cursor: pointer;
+            color: #CBFFFA;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: black;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            width: 160px;
+        }
+        .dropdown a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #CBFFFA;
+            font-size: 15px;
+            background-color: black;
+        }
+        .dropdown a:hover {
+            background-color: #222;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 1000px;
+            text-align: center;
+            padding: 10px;
+            background-color: black;
+            color: #CBFFFA;
+            font-size: 15px;
+        }
+        .footer button {
+            background: none;
+            border: none;
+            color: #CBFFFA;
+            cursor: pointer;
+            margin: 0 15px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .footer button:hover {
+            text-decoration: underline;
+        }
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 14px;
+            background-color: #CBFFFA;
+            color: black;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .chatbot-button i {
+            font-size: 22px;
+        }
+        .chatbot-button:hover {
+            background-color: #05d9ff;
+        }
+        .job-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .job-card {
+            background: #222;
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .job-card:hover {
+            transform: scale(1.05);
+        }
+        .job-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .job-description {
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        .apply-btn, .savepost {
+            background-color: #CBFFFA;
+            color: black;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .apply-btn:hover, .savepost:hover{
+            background: #05d9ff;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #222;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            width: 30%;
+            max-height: 70vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            word-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-content::-webkit-scrollbar {
+            display: none;
+        }
+        .close-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: #ff4d4d;
+            background: rgba(255, 77, 77, 0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            align-self:flex-end;
+            margin-top: 10px;
+        }
+        #modalImage {
+            margin-top: 10px;
+            width: 95%;
+            max-height: 180px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: #fff;
+            padding: 5px;
+        }
+        #modalDescription {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <header class="header" id="mainHeader">
+        <div class="logo">
+            <img src="image/logo1.png" alt="Logo">
+            <span>HIGHTAIL</span>
+        </div>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='savepost.html'">Saved</button>
+            <button onclick="window.location.href='applypost.html'">Applied</button>
+        </div>
+        <div class="profile-menu">
+            <i class='bx bx-user' onclick="toggleMenu()"></i>
+            <div class="dropdown" id="profileDropdown">
+                <a href="profile.html">View Profile</a>
+                <a href="login.html" id="loginLink">Login</a>
+                <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <main style="margin-bottom: 30px;">
+        <div class="search-bar">
+            <i class='bx bx-search'></i>
+            <input type="text" id="searchBar" placeholder="Search job posts..." onkeyup="searchJobs()">
+        </div>
+        <div id="jobContainer" class="job-container"></div>
+    </main>
+    <div class="modal" id="jobModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <img id="modalImage" src="" alt="Job Image">
+            <h3 id="modalTitle"></h3>
+            <p><strong>Company:</strong> <span id="modalCompany"></span></p>
+            <p><strong>Location:</strong> <span id="modalLocation"></span></p>
+            <p><strong>Salary:</strong> <span id="modalSalary"></span></p>
+            <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+            <button class="apply-btn" id="applyButton">Apply Now</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <button onclick="window.location.href='feedback.html'">Feedback</button>
+        <button onclick="window.location.href='contact.html'">Contact Us</button>
+        <button onclick="window.location.href='guide.html'">Hightail Guide</button>
+    </footer>
+    
+    <button class="chatbot-button" onclick="window.location.href='chatbot.html'">
+        <i class='bx bx-message-rounded'></i>
+    </button>
+
+    <script>
+        function toggleMenu() {
+            var dropdown = document.getElementById("profileDropdown");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+        
+        window.addEventListener("scroll", function() {
+            var header = document.getElementById("mainHeader");
+            if (window.scrollY > 50) {
+                header.classList.add("scrolled");
+            } else {
+                header.classList.remove("scrolled");
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const loginBtn = document.getElementById("loginLink");
+        const logoutBtn = document.getElementById("logoutLink");
+    
+        function updateButtons() {
+          const token = localStorage.getItem("token");
+          if (token) {
+            loginBtn.style.display = "none";
+            logoutBtn.style.display = "inline-block";
+          } else {
+            loginBtn.style.display = "inline-block";
+            logoutBtn.style.display = "none";
+          }
+        }
+    
+        loginBtn.addEventListener("click", function () {
+          window.location.href = "login.html";
+        });
+    
+        logoutBtn.addEventListener("click", function () {
+          localStorage.removeItem("token");
+          updateButtons();
+        });
+    
+        updateButtons();
+      });
+    </script>
+    <script>
+        function searchJobs() {
+        const searchText = document.getElementById("searchBar").value.toLowerCase();
+        const jobCards = document.querySelectorAll(".job-card");
+    
+        jobCards.forEach(card => {
+            const jobTitle = card.querySelector(".job-title").textContent.toLowerCase();
+            const companyName = card.querySelector(".job-company").textContent.toLowerCase();
+            const jobDescription = card.querySelector(".job-description").textContent.toLowerCase();
+    
+            if (jobTitle.includes(searchText) || companyName.includes(searchText) || jobDescription.includes(searchText)) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", fetchJobs);
+
+async function fetchJobs() {
+    try {
+        const response = await fetch("http://localhost:4000/view-jobs");
+        const jobs = await response.json();
+
+        const jobContainer = document.getElementById("jobContainer");
+        jobContainer.innerHTML = "";
+
+        jobs.forEach(job => {
+            const jobCard = document.createElement("div");
+            jobCard.classList.add("job-card");
+            jobCard.innerHTML = `
+                <img src="http://localhost:4000/uploads/${job.jobImage}" alt="Job Image">
+                <div class="job-info">
+                    <div class="job-title">${job.jobTitle}</div>
+                    <div class="job-company">${job.companyName}</div>
+                    <div class="job-description">${job.jobDescription.substring(0, 100)}...</div>
+                </div>
+                <div class="job-footer">
+                    <span>${job.location} | 💰 ${job.salary}</span>
+                    <button class="savepost" data-jobid="${job._id}">Save</button>
+                </div>
+            `;
+
+            jobCard.querySelector(".savepost").addEventListener("click", (event) => {
+                event.stopPropagation();
+                saveJob(job._id);
+            });
+
+            jobCard.addEventListener("click", () => openModal(job));
+            jobContainer.appendChild(jobCard);
+        });
+    } catch (error) {
+        console.error("Error fetching jobs:", error);
+    }
+}
+
+function openModal(job) {
+    document.getElementById("modalImage").src = `http://localhost:4000/uploads/${job.jobImage}`;
+    document.getElementById("modalTitle").textContent = job.jobTitle;
+    document.getElementById("modalCompany").textContent = job.companyName;
+    document.getElementById("modalLocation").textContent = job.location;
+    document.getElementById("modalSalary").textContent = job.salary;
+    document.getElementById("modalDescription").textContent = job.jobDescription;
+    document.getElementById("jobModal").style.display = "flex";
+    document.getElementById("applyButton").onclick = () => applyJob(job._id);
+}
+
+function closeModal() {
+    document.getElementById("jobModal").style.display = "none";
+}
+
+async function applyJob(jobId) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("You must be logged in to apply for a job.");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:4000/apply-job", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`node
+            },
+            body: JSON.stringify({ jobId })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            if (data.error === "You have already applied for this job") {
+                alert("You have already applied for this job.");
+                return;
+            }
+            throw new Error(data.error || "Failed to apply");
+        }
+
+        alert("Application submitted successfully!");
+
+        // Fetch updated user applications for display
+        await fetchUserApplications();
+
+        closeModal();
+    } catch (error) {
+        console.error("Error applying for job:", error);
+    }
+}
+async function saveJob(jobId) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("You must be logged in to save a job.");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:4000/save-job", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ jobId })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Failed to save job");
+        alert(data.message);
+    } catch (error) {
+        console.error("Error saving job:", error);
+    }
+}
+
+</script>
+</body>
+</html>

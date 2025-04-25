@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applied Jobs</title>
+    <style>
+ /* General Page Styling */
+/* General Page Styling */
+body {
+    font-family: Arial, sans-serif;
+    background: black;
+    margin: 0 auto; /* Centers the body */
+    padding: 20px;
+    text-align: center;
+    color: #e0e0e0;
+    width: 1000px; /* Fixed width */
+}
+
+
+/* Page Heading */
+h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #cbfffc;
+}
+
+/* Job Container */
+.job-container {
+    max-width: 800px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Job Card */
+.job-card {
+    background: #1e1e1e; /* Dark gray */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: 0.3s;
+    text-align: left;
+}
+
+.job-card:hover {
+    transform: scale(1.02);
+}
+
+/* Job Image */
+.job-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* Job Info */
+.job-card h3 {
+    margin: 5px 0;
+    font-size: 18px;
+    color: #cbfffa; /* Green accent */
+}
+
+.job-card p {
+    margin: 2px 0;
+    font-size: 14px;
+    color: #b3b3b3;
+}
+
+/* Remove Button */
+.remove-btn {
+    background: #b91c1c; /* Dark red */
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.remove-btn:hover {
+    background: #991b1b;
+}
+
+/* Error Message */
+#errorMessage {
+    font-size: 16px;
+    color: #ff4d4d;
+    margin-top: 10px;
+}
+#modalDescription {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    display: block;
+    max-height: 200px; /* Adjust as needed */
+    overflow-y: auto;
+}
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content:flex-start;
+    cursor: pointer;
+}
+
+.logo img {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo span {
+    font-size: 22px;
+    font-weight: 600;
+    color: #CBFFFA;
+}
+    </style>
+</head>
+<body>
+    <div class="logo" onclick="window.location.href='homepage.html'">
+        <img src="image/logo1.png" alt="Logo">
+        <span>HIGHTAIL</span>
+    </div>
+    <h2>My Applied Jobs</h2>
+    <div id="jobContainer" class="job-container"></div>
+    <p id="errorMessage" style="color: red;"></p>
+
+    <script>
+async function fetchAppliedJobs() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        document.getElementById("errorMessage").innerText = "You need to log in first.";
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:4000/view-applied-jobs", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Error ${response.status}: ${errorText}`);
+        }
+
+        const jobs = await response.json();
+        const jobContainer = document.getElementById("jobContainer");
+
+        if (jobs.length === 0) {
+            jobContainer.innerHTML = "<p>No applied jobs found.</p>";
+            return;
+        }
+
+        jobs.forEach(job => {
+            const jobElement = document.createElement("div");
+            jobElement.className = "job-card";
+            jobElement.innerHTML = `
+                <img src="http://localhost:4000/uploads/${job.jobImage}" alt="Job Image">
+                <h3>${job.jobTitle}</h3>
+                <p><strong>Company:</strong> ${job.companyName}</p>
+                <p id="modalDescription">${job.jobDescription}</p>
+                <button class="remove-btn" onclick="removeApplication('${job.jobId}')">Remove</button>
+            `;
+            jobContainer.appendChild(jobElement);
+        });
+
+    } catch (error) {
+        document.getElementById("errorMessage").innerText = "Error fetching applied jobs: " + error.message;
+    }
+}
+
+async function removeApplication(jobId) {
+    const token = localStorage.getItem("token");
+
+    try {
+        const response = await fetch("http://localhost:4000/remove-applied-job", {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ jobId })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Error ${response.status}: ${errorText}`);
+        }
+
+        alert("Job application removed successfully!");
+        location.reload();
+
+    } catch (error) {
+        alert("Error removing job: " + error.message);
+    }
+}
+
+
+fetchAppliedJobs();
+    </script>
+
+</body>
+</html>
